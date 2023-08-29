@@ -1,0 +1,257 @@
+<head>
+    <script src="../static/jquery-3.6.4.js" ></script>
+    <script>
+        $(document).ready(()=>{
+            $('.numbers').keypress(function(event) {
+                if (event.which != 46 && (event.which < 47 || event.which > 59))
+                {
+                    event.preventDefault();
+                    if ((event.which == 46) && ($(this).indexOf('.') != -1)) {
+                        event.preventDefault();
+                    }
+                }
+            });
+
+            $( "form" ).on( "submit", function(e) {
+                var dataString = $(this).serialize();
+                // alert(dataString); return false; 
+                    $.ajax({
+                    type: "POST",
+                    url: "/predict/",
+                    data: dataString,
+                    success: function (data) {
+                        var resulthtml = ''
+                        if (data == '1') {
+                            resulthtml = 'Result: <font color="red"> FATAL! </font>'
+                        } else {
+                            resulthtml = 'Result: <font color="blue"> Non fatal </font>'
+                        }
+                        $("#divresult")
+                        .html(resulthtml)
+                        .hide()
+                        .fadeIn(500, function () {
+                            $("#message").append(
+                            "<img id='checkmark' src='images/check.png' />"
+                            );
+                        });
+                    }
+                });
+                e.preventDefault();
+            });
+        });
+           
+
+  
+    </script>
+</head> 
+
+<body>
+    <div>
+        <form>
+            <table border="1">
+                <tr>
+                    <th>LogisticRegression</th>
+                    <th>DecisionTree</th>
+                    <th>RandomForest</th>
+                    <th>NeuralNetwork</th>
+                </tr>
+                <tr>
+                    <td><img src='../static/lr.png' width="200" height="200" /></td>
+                    <td><img src='../static/bt.png' width="200" height="200"/></td>
+                    <td><img src='../static/rf.png' width="200" height="200"/></td>
+                    <td><img src='../static/nn.png' width="200" height="200"/></td>
+                </tr>
+                <tr>
+                    <td><input name='rb_model' type='radio' value='0' checked>click me</input></td>
+                    <td><input name='rb_model' type='radio' value='1'>click me</input></td>
+                    <td><input name='rb_model' type='radio' value='2'>click me</input></td>
+                    <td><input name='rb_model' type='radio' value='3'>click me</input></td>
+                </tr>
+            </table>
+            <br />
+            <table border="1">
+                <tr>
+                    <td>
+                        <label for="INTERVAL">INTERVAL:</label>
+                        <select name="INTERVAL" id="ddl_interval">
+                            <option value="0000-0300">0000-0300</option>
+                            <option value="0300-0600">0300-0600</option>
+                            <option value="0600-0900">0600-0900</option>
+                            <option value="0900-1200">0900-1200</option>
+                            <option value="1200-1500">1200-1500</option>
+                            <option value="1500-1800">1500-1800</option>
+                            <option value="1800-2100">1800-2100</option>
+                            <option value="2100-0000">2100-0000</option>
+                        </select>
+                    </td>
+                    <td colspan="3"><center><div id='divresult'>
+                        <!-- {% if (result==1) %}
+                            <font color="red"> FATAL! </font>
+                        {% elif (result==0) %}
+                            <font color="blue"> Non fatal </font>
+                        {% endif %} -->
+                    </div></center></td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>DISTRICT:</label>
+                        <select name="DISTRICT" id="ddl_district">
+                            <option value="Etobicoke York">Etobicoke York</option>
+                            <option value="North York">North York</option>
+                            <option value="Scarborough">Scarborough</option>
+                            <option value="Toronto and East York">Toronto and East York</option>
+                        </select>
+                    </td>
+                    <td>
+                        <label>VISIBILITY:</label>
+                        <select name="VISIBILITY" id="ddl_visibility">
+                            <option value="Clear">Clear</option>
+                            <option value="Drifting Snow">Drifting Snow</option>
+                            <option value="Fog, Mist, Smoke, Dust">Fog, Mist, Smoke, Dust</option>
+                            <option value="Freezing Rain">Freezing Rain</option>
+                            <option value="Rain">Rain</option>
+                            <option value="Snow">Snow</option>
+                            <option value="Strong wind">Strong wind</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </td>
+                    <td>
+                        <label>LIGHT:</label>
+                        <select name="LIGHT" id="ddl_light">
+                            <option value="Dark">Dark</option>
+                            <option value="Dark, artificial">Dark, artificial</option>
+                            <option value="Dawn">Dawn</option>
+                            <option value="Dawn, artificial">Dawn, artificial</option>
+                            <option value="Daylight">Daylight</option>
+                            <option value="Daylight, artificial">Daylight, artificial</option>
+                            <option value="Dusk">Dusk</option>
+                            <option value="Dusk, artificial">Dusk, artificial</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </td>
+                    <td>
+                        <label>RDSFCOND:</label>
+                        <select name="RDSFCOND" id="ddl_rdsfcond">
+                            <option value="Dry">Dry</option>
+                            <option value="Ice">Ice</option>
+                            <option value="Loose Sand or Gravel">Loose Sand or Gravel</option>
+                            <option value="Loose Snow">Loose Snow</option>
+                            <option value="Packed Snow">Packed Snow</option>
+                            <option value="Slush">Slush</option>
+                            <option value="Spilled liquid">Spilled liquid</option>
+                            <option value="Wet">Wet</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>PEDESTRIAN:</label>
+                    </td>
+                    <td>
+                        <input name='rb_pedestrian' type='radio' value='Yes'>Yes</input>
+                        <input name='rb_pedestrian' type='radio' value='' checked>No</input>
+                    </td>
+                    <td>
+                        <label>CYCLIST:</label>
+                    </td>
+                    <td>
+                        <input name='rb_cyclist' type='radio' value='Yes'>Yes</input>
+                        <input name='rb_cyclist' type='radio' value='' checked>No</input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>AUTOMOBILE:</label>
+                    </td>
+                    <td>
+                        <input name='rb_automobile' type='radio' value='Yes'>Yes</input>
+                        <input name='rb_automobile' type='radio' value='' checked>No</input>
+                    </td>
+                    <td>
+                        <label>MOTORCYCLE:</label>
+                    </td>
+                    <td>
+                        <input name='rb_motorcycle' type='radio' value='Yes'>Yes</input>
+                        <input name='rb_motorcycle' type='radio' value='' checked>No</input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>TRUCK:</label>
+                    </td>
+                    <td>
+                        <input name='rb_truck' type='radio' value='Yes'>Yes</input>
+                        <input name='rb_truck' type='radio' value='' checked>No</input>
+                    </td>
+                    <td>
+                        <label>TRSN_CITY_VEH:</label>
+                    </td>
+                    <td>
+                        <input name='rb_trsncityveh' type='radio' value='Yes'>Yes</input>
+                        <input name='rb_trsncityveh' type='radio' value='' checked>No</input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>EMERG_VEH:</label>
+                    </td>
+                    <td>
+                        <input name='rb_emergveh' type='radio' value='Yes'>Yes</input>
+                        <input name='rb_emergveh' type='radio' value='' checked>No</input>
+                    </td>
+                    <td>
+                        <label>PASSENGER:</label>
+                    </td>
+                    <td>
+                        <input name='rb_passenger' type='radio' value='Yes'>Yes</input>
+                        <input name='rb_passenger' type='radio' value='' checked>No</input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>SPEEDING:</label>
+                    </td>
+                    <td>
+                        <input name='rb_speeding' type='radio' value='Yes'>Yes</input>
+                        <input name='rb_speeding' type='radio' value='' checked>No</input>
+                    </td>
+                    <td>
+                        <label>AG_DRIV:</label>
+                    </td>
+                    <td>
+                        <input name='rb_agdriv' type='radio' value='Yes'>Yes</input>
+                        <input name='rb_agdriv' type='radio' value='' checked>No</input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>REDLIGHT:</label>
+                    </td>
+                    <td>
+                        <input name='rb_redlight' type='radio' value='Yes'>Yes</input>
+                        <input name='rb_redlight' type='radio' value='' checked>No</input>
+                    </td>
+                    <td>
+                        <label>ALCOHOL:</label>
+                    </td>
+                    <td>
+                        <input name='rb_alcohol' type='radio' value='Yes'>Yes</input>
+                        <input name='rb_alcohol' type='radio' value='' checked>No</input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>DISABILITY:</label>
+                    </td>
+                    <td>
+                        <input name='rb_disability' type='radio' value='Yes'>Yes</input>
+                        <input name='rb_disability' type='radio' value='' checked>No</input>
+                    </td>
+                    <td></td>
+                    <td><input type="submit" id="btn_submit"></button></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</body>
